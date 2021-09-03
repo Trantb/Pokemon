@@ -28,7 +28,7 @@ addStat <- df[,c(9, 10, 4, 5, 2, 6, 8, 1, 3, 7)]
 
 #regroup data
 data <- cbind(pokInfo, baseStat, addStat, againstType)
-rm(addStat, againstType, baseStat, pokInfo)
+rm(addStat, againstType, baseStat, pokInfo, df)
 #plot
 library(ggplot2)
 library(tidyverse)
@@ -127,3 +127,40 @@ colors <- matrix(sapply(d, function(x) ifelse(x < 1, 'Green',
                  ncol = ncol(d))
 par(mar=c(0,0,1,0))
 plot_table(d, colors, 'gray90', main = 'Against', text.cex = 0.8)
+
+
+
+##Fairy
+fairy <- data %>%
+  filter(type1 == "fairy")
+p <- data%>%
+  filter(type2 == "fairy")
+fairy <- rbind(fairy, p)
+rm(p)
+ggplot(psychic, aes(x = sp_attack, y = speed)) +
+  geom_point(aes(color = factor(generation), 
+                 shape = factor(is_legendary)), 
+             size = 5) +
+  geom_text_repel(aes(label = name), size = 3, nudge_x = 0, nudge_y = -2.5,
+                  max.overlaps = 20) + 
+  geom_hline(yintercept = 100, linetype = 'dashed') +  
+  geom_vline(xintercept = 100, linetype = 'dashed') +
+  coord_cartesian(xlim = c(0, 200), ylim = c(0, 200)) +
+  theme(panel.background = element_rect(fill = 'grey90'))
+
+
+
+g <- ggplot(fairy, aes(defense, sp_defense)) + 
+        geom_hline(yintercept = 100, linetype = 'dashed') +
+        geom_vline(xintercept = 100, linetype = 'dashed')
+g
+g + geom_point(aes(size = hp, color = factor(generation))) +
+  scale_x_continuous(breaks = seq(0, 160, 20)) +
+  scale_y_continuous(breaks = seq(0, 160, 20)) +
+  scale_size(range = c(1, 10)) +
+  geom_text_repel(aes(label = name), size = 3, nudge_x = 0, nudge_y = -2.5) +
+  theme(legend.position = c(.95, .4),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(5, 5, 5, 5))
+  
